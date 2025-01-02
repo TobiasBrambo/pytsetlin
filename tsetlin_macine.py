@@ -85,7 +85,7 @@ class TsetlinMachine:
 
         self.C = np.zeros((self.n_clauses, 2*self.n_literals), dtype=np.int8)
 
-        self.W = np.random.choice(np.array([-1, 1]), size=(self.n_outputs, self.n_clauses), replace=True).astype(np.int32)
+        self.W = np.random.choice(np.array([-1, 1]), size=(self.n_clauses, self.n_outputs), replace=True).astype(np.int32)
 
 
     def reset(self):
@@ -103,23 +103,13 @@ class TsetlinMachine:
 
 
 
-        print(self.C.shape)
-        print(self.W.shape)
-        print(self.x_train.shape)
-
-        print(self.n_outputs)
-        print(self.n_literals)
-
-
-        assert False
-
-
         with tqdm.tqdm(total=training_epochs, disable=hide_progress_bar) as progress_bar:
             progress_bar.set_description(f"[N/A/{training_epochs}], Train Acc: N/A, Eval Acc: N/A, Best Eval Acc: N/A")
 
             for epoch in range(training_epochs):
 
                 executor.train_epoch(self.C, self.W, self.x_train, self.y_train, self.threshold, self.s, self.n_outputs, self.n_literals)
+
 
                 if (epoch+1) % eval_freq == 0:
 
@@ -131,7 +121,9 @@ class TsetlinMachine:
                 progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Train Acc: N/A, Eval Acc: {score}, Best Eval Acc: N/A") 
                 progress_bar.update(1)
 
-
+                if score >= early_stop_at:
+                    break
+    
 
     def predict():
         pass

@@ -4,40 +4,29 @@ import numpy as np
 
 
 @njit
-def evaluate_clauses_training(literals, cb):
+def evaluate_clauses_training(literals, cb, n_literals):
 
     # captures the imply opperation ta -> lit?
 
-    clause_outputs = np.ones(cb.shape[0], dtype=np.int32)
-
-    n_literals = len(literals) // 2
+    clause_outputs = np.ones(cb.shape[0], dtype=np.uint8)
+    
 
     for index in range(cb.shape[0]):
         
-
-        clause_outputs[index] = 1
-
-
         for i in range(n_literals):
 
-            if cb[index][i] >= 0:
+            if(cb[index][i] > 0):
 
-                if literals[i] == 0:
-
+                if(literals[i] == 0):
                     clause_outputs[index] = 0
-
                     break
 
 
-            if cb[index][i + n_literals] >= 0:
-            
-                if literals[i] == 1:
+            if(cb[index][i + n_literals] > 0):
 
+                if(literals[i] == 1):    
                     clause_outputs[index] = 0
-
                     break
-
-
 
     return clause_outputs
 
@@ -53,15 +42,13 @@ def evaluate_clause(literals, clause_block, n_literals):
         is_empty_clause = True
 
         for literal_k in range(n_literals):
-            
-            # pos side
+
             if(clause_block[clause_k][literal_k] > 0):
                 is_empty_clause = False
                 if(literals[literal_k] == 0):
                     clause_outputs[clause_k] = 0
                     break
             
-            # neg side
             if(clause_block[clause_k][literal_k + n_literals] > 0):
                 is_empty_clause = False
                 if(literals[literal_k] == 1):    
@@ -76,9 +63,11 @@ def evaluate_clause(literals, clause_block, n_literals):
 
 @njit
 def get_update_p(wb, clause_outputs, threshold, y, target_class):
-    
-    vote_value = np.dot(wb[y].astype(np.float32), clause_outputs.astype(np.float32))
-    vote_value = np.clip(np.array(vote_value), -threshold, threshold)
+  
+
+    vote_value = np.dot(clause_outputs.astype(np.float32), wb.astype(np.float32))
+
+    vote_value = np.clip(np.array(vote_value[y]), -threshold, threshold)
 
     if target_class:
         return (threshold - vote_value) / (2 * threshold)
@@ -92,7 +81,6 @@ def update_clauses(cb, wb, clause_outputs, positive_prob, negative_prob, target,
     
     for clause_k in range(cb.shape[0]):
 
-        
         if np.random.random() < positive_prob:
             update_clause(cb[clause_k], wb[clause_k], 1, literals, n_literals, clause_outputs[clause_k], target, s) 
 
@@ -126,7 +114,7 @@ def update_clause(clause_row, clause_weight, target, literals, n_literals, claus
 @njit
 def T1aFeedback(clause_row, literals, n_literals, s):
     s_inv = (1.0 / s)
-    s_min1_inv = (s - 10) / s
+    s_min1_inv = (s - 1.0) / s
 
     lower_state = -127
     upper_state =  127
@@ -134,7 +122,6 @@ def T1aFeedback(clause_row, literals, n_literals, s):
     for literal_k in range(n_literals):
 
         if(literals[literal_k] == 1):
-
             if(np.random.random() <= s_min1_inv):
                 if(clause_row[literal_k] < upper_state):
                     clause_row[literal_k] += 1
@@ -184,4 +171,5 @@ def T2Feedback(clause_row, literals, n_literals):
 
         else:
             if(clause_row[literal_k + n_literals] < 0):
+                
                 clause_row[literal_k + n_literals] += 1

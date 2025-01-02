@@ -16,11 +16,9 @@ def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals):
 
     for indice in indices:
         
-        clause_outputs = evaluate_clauses_training(x[indice], cb)
+        clause_outputs = evaluate_clauses_training(x[indice], cb, n_literals)
 
         pos_update_p = get_update_p(wb, clause_outputs, threshold, y[indice], True)
-
-
 
         update_ps = np.zeros(n_outputs, dtype=np.float32)
 
@@ -41,16 +39,11 @@ def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals):
 
         neg_update_p = update_ps[not_target]
 
-
         update_clauses(cb, wb, clause_outputs, pos_update_p, neg_update_p, y[indice], not_target, x[indice], n_literals, s)
 
 @njit
 def classify(x, clause_block, weight_block, threshold, n_outputs, n_literals):
 
-    max_class_sum = -threshold
-    max_class = 0
-
-    all_class_sums = np.zeros(n_outputs, dtype=np.float32)
 
     clause_outputs = np.zeros(clause_block.shape[0], dtype=np.int32)
 
@@ -58,15 +51,10 @@ def classify(x, clause_block, weight_block, threshold, n_outputs, n_literals):
     clause_outputs = evaluate_clause(x, clause_block, n_literals)
 
 
-    for i in range(n_outputs):
-        class_sum = np.dot(weight_block[i].astype(np.float32), clause_outputs.astype(np.float32))
-        all_class_sums[i] = class_sum
+    class_sums = np.dot(clause_outputs.astype(np.float32), weight_block.astype(np.float32))
 
-        if class_sum > max_class_sum:
-            max_class_sum = class_sum
-            max_class = i
     
-    return max_class
+    return np.argmax(class_sums)
   
 @njit
 def eval_predict(x_eval, cb, wb, threshold, n_outputs, n_literals):

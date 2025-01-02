@@ -20,13 +20,15 @@ if __name__ == "__main__":
     x, y = get_xor(flip_fraction=0.0)
 
 
-    tm = TsetlinMachine()
+    tm = TsetlinMachine(n_clauses=1000,
+                        threshold=500,
+                        s=2.0)
 
     tm.set_train_data(x, y)
 
     tm.set_eval_data(x, y)
 
-    tm.train()
+    tm.train(training_epochs=1000)
 
 
 
