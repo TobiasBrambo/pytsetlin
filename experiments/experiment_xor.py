@@ -17,11 +17,11 @@ from tsetlin_macine import TsetlinMachine
 
 if __name__ == "__main__":
 
-    x, y = get_xor(flip_fraction=0.0)
+    x, y = get_xor(flip_fraction=0.1)
 
 
     tm = TsetlinMachine(n_clauses=1000,
-                        threshold=500,
+                        threshold=5000,
                         s=2.0)
 
     tm.set_train_data(x, y)

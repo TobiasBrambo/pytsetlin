@@ -15,14 +15,14 @@ def evaluate_clauses_training(literals, cb, n_literals):
         
         for i in range(n_literals):
 
-            if(cb[index][i] > 0):
+            if(cb[index][i] >= 0):
 
                 if(literals[i] == 0):
                     clause_outputs[index] = 0
                     break
 
 
-            if(cb[index][i + n_literals] > 0):
+            if(cb[index][i + n_literals] >= 0):
 
                 if(literals[i] == 1):    
                     clause_outputs[index] = 0
@@ -43,13 +43,13 @@ def evaluate_clause(literals, clause_block, n_literals):
 
         for literal_k in range(n_literals):
 
-            if(clause_block[clause_k][literal_k] > 0):
+            if(clause_block[clause_k][literal_k] >= 0):
                 is_empty_clause = False
                 if(literals[literal_k] == 0):
                     clause_outputs[clause_k] = 0
                     break
             
-            if(clause_block[clause_k][literal_k + n_literals] > 0):
+            if(clause_block[clause_k][literal_k + n_literals] >= 0):
                 is_empty_clause = False
                 if(literals[literal_k] == 1):    
                     clause_outputs[clause_k] = 0
