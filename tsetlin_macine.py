@@ -85,7 +85,7 @@ class TsetlinMachine:
 
         self.C = np.zeros((self.n_clauses, 2*self.n_literals), dtype=np.int8)
 
-        self.W = np.random.choice(np.array([-1, 1]), size=(self.n_clauses, self.n_outputs), replace=True).astype(np.int32)
+        self.W = np.random.choice(np.array([-1, 1]), size=(self.n_outputs, self.n_clauses), replace=True).astype(np.int32)
 
 
     def reset(self):
@@ -110,13 +110,13 @@ class TsetlinMachine:
 
                 executor.train_epoch(self.C, self.W, self.x_train, self.y_train, self.threshold, self.s, self.n_outputs, self.n_literals)
 
-
                 if (epoch+1) % eval_freq == 0:
 
                     y_hat = executor.eval_predict(self.x_eval, self.C, self.W, self.threshold, self.n_outputs, self.n_literals)
 
                     score = np.mean(y_hat == self.y_eval)
 
+                    print(score)
 
                 progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Train Acc: N/A, Eval Acc: {score}, Best Eval Acc: N/A") 
                 progress_bar.update(1)
