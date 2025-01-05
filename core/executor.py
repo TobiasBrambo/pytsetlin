@@ -4,12 +4,15 @@ from numba import njit
 import numpy as np
 
 
-from core.feedback import evaluate_clauses_training, get_update_p, update_clauses, evaluate_clause
+from core.feedback import evaluate_clauses_training, get_update_p, evaluate_clause, T2Feedback, T1Feedback
 
 
 
 @njit
 def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals):
+
+    cb = np.ascontiguousarray(cb)
+    wb = np.ascontiguousarray(wb)
 
     indices = np.arange(x.shape[0], dtype=np.int32) # this does not need to be calulated at every epoch...
     np.random.shuffle(indices)
@@ -21,27 +24,41 @@ def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals):
 
         clause_outputs = evaluate_clauses_training(literals, cb, n_literals)
 
+        target_update_p = get_update_p(wb, clause_outputs, threshold, target, True)
+
+        # T1a
+        # T1b
+        T1Feedback(target_update_p, cb, wb, clause_outputs, literals, n_literals, 1, target, s)
+        T2Feedback(target_update_p, cb, wb, clause_outputs, literals, n_literals, 1, target)
+
+
         update_ps = np.zeros(n_outputs, dtype=np.float32)
 
         for i in range(n_outputs):
 
             if i == target:
-                update_ps[i] = get_update_p(wb, clause_outputs, threshold, i, True)
+                update_ps[i] = 0.0
             else:
                 update_ps[i] = get_update_p(wb, clause_outputs, threshold, i, False)    
 
         if np.sum(update_ps) == 0.0:
-            return
+            return cb, wb
         
         not_target = np.random.randint(n_outputs)
 
         while not_target == target:
             not_target = np.random.randint(n_outputs)
 
-        pos_update_p = update_ps[target]
-        neg_update_p = update_ps[not_target]
 
-        update_clauses(cb, wb, clause_outputs, pos_update_p, neg_update_p, target, not_target, literals, n_literals, s)
+        not_target_update_p = update_ps[not_target]
+
+        T1Feedback(not_target_update_p, cb, wb, clause_outputs, literals, n_literals, -1, not_target, s)
+        T2Feedback(not_target_update_p, cb, wb, clause_outputs, literals, n_literals, -1, not_target)
+
+
+        # update_clauses(cb, wb, clause_outputs, pos_update_p, neg_update_p, target, not_target, literals, n_literals, s)
+
+    return cb, wb
 
 @njit
 def classify(x, clause_block, weight_block, threshold, n_literals, n_outputs):

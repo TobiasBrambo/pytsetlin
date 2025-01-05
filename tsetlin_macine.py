@@ -95,20 +95,28 @@ class TsetlinMachine:
     def train(self, 
               training_epochs:int=10,
               eval_freq:int=1,
-              hide_progress_bar:bool=False,
+              hide_progress_bar:bool=True,
               early_stop_at:float=1.0):
 
 
         self.allocate_memory()
 
-
-
         with tqdm.tqdm(total=training_epochs, disable=hide_progress_bar) as progress_bar:
             progress_bar.set_description(f"[N/A/{training_epochs}], Train Acc: N/A, Eval Acc: N/A, Best Eval Acc: N/A")
 
+
+            print(self.C.shape)
+
+            print(self.n_literals)
+
             for epoch in range(training_epochs):
 
-                executor.train_epoch(self.C, self.W, self.x_train, self.y_train, self.threshold, self.s, self.n_outputs, self.n_literals)
+                self.C, self.W = executor.train_epoch(
+                    self.C, self.W, self.x_train, self.y_train, 
+                    self.threshold, self.s, self.n_outputs, self.n_literals
+                    )
+                
+                print(self.C)
 
                 if (epoch+1) % eval_freq == 0:
 
