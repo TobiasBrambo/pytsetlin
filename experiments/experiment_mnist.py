@@ -9,8 +9,6 @@ from tsetlin_machine import TsetlinMachine
 
 
 
-
-
 if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = get_mnist()
