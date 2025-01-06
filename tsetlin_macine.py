@@ -105,10 +105,6 @@ class TsetlinMachine:
             progress_bar.set_description(f"[N/A/{training_epochs}], Train Acc: N/A, Eval Acc: N/A, Best Eval Acc: N/A")
 
 
-            print(self.C.shape)
-
-            print(self.n_literals)
-
             for epoch in range(training_epochs):
 
                 self.C, self.W = executor.train_epoch(
@@ -116,8 +112,6 @@ class TsetlinMachine:
                     self.threshold, self.s, self.n_outputs, self.n_literals
                     )
                 
-                print(self.C)
-
                 if (epoch+1) % eval_freq == 0:
 
                     y_hat = executor.eval_predict(self.x_eval, self.C, self.W, self.threshold, self.n_outputs, self.n_literals)
@@ -144,5 +138,3 @@ if __name__ == "__main__":
     tm = TsetlinMachine()
 
     tm.train()
-
-

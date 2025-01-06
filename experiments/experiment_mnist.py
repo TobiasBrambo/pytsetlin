@@ -18,10 +18,7 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = get_mnist(add_negated=True)
 
-    print(X_train.shape)
 
-    import numpy as np
-    print(np.sum(X_train, axis=1))
 
     tm = TsetlinMachine(n_clauses=100,
                         threshold=50,
