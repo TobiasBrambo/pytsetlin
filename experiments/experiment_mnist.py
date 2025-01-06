@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from data.mnist import get_mnist
 
-from tsetlin_macine import TsetlinMachine
+from tsetlin_machine import TsetlinMachine
 
 
 
