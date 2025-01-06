@@ -1,24 +1,18 @@
-
-
 from core import executor
 import tqdm
 import numpy as np
-
+from time import perf_counter
 
 
 class TsetlinMachine:
     def __init__(self,
                  n_clauses:int = 50,
                  s:float = 5.0,
-                 threshold:int = 100,
-                 n_literals = None):
+                 threshold:int = 100):
 
         self.n_clauses = n_clauses        
         self.s = s    
         self.threshold = threshold    
-
-        self.n_literals = n_literals
-        self.n_outputs = None
 
         self.C = None        
         self.W = None
@@ -95,7 +89,14 @@ class TsetlinMachine:
 
 
     def reset(self):
-        pass
+        self.C = None        
+        self.W = None
+
+        self.x_train = None
+        self.y_train = None
+
+        self.x_eval = None
+        self.y_eval = None
 
 
     def train(self, 
@@ -107,7 +108,10 @@ class TsetlinMachine:
 
         self.allocate_memory()
 
-        r = {}
+        r = {
+            'train_time' : [],
+            'eval_acc' : [],
+        }
 
         best_eval_acc = "N/A"
         eval_score = "N/A"
@@ -118,20 +122,27 @@ class TsetlinMachine:
 
             for epoch in range(training_epochs):
 
+                st = perf_counter() 
+
                 executor.train_epoch(
                     self.C, self.W, self.x_train, self.y_train, 
                     self.threshold, self.s, self.n_outputs, self.n_literals
                     )
+                
+                et = perf_counter()
                 
                 if (epoch+1) % eval_freq == 0:
 
                     y_hat = executor.eval_predict(self.x_eval, self.C, self.W, self.n_literals)
 
                     eval_score = round(100 * np.mean(y_hat == self.y_eval), 2)
+                    r["eval_acc"].append(et-st)
 
                     if best_eval_acc == 'N/A' or eval_score > best_eval_acc:
                         best_eval_acc = round(eval_score, 2)
+                        r["best_eval_acc"] = best_eval_acc
 
+                r["train_time"].append(et-st)
 
                 progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}") 
                 progress_bar.update(1)
@@ -139,6 +150,8 @@ class TsetlinMachine:
                 if not eval_score == 'N/A':
                     if eval_score >= early_stop_at:
                         break
+
+        return r
     
 
     def predict(self, x):

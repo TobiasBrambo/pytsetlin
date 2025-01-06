@@ -6,7 +6,7 @@ import numpy as np
 @njit
 def evaluate_clauses_training(literals, cb, n_literals, clause_outputs):
 
-    # captures the imply opperation ta -> lit?
+    # captures the imply operation ta -> lit?
 
     clause_outputs.fill(1)
     
