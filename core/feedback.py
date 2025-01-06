@@ -4,11 +4,11 @@ import numpy as np
 
 
 @njit
-def evaluate_clauses_training(literals, cb, n_literals):
+def evaluate_clauses_training(literals, cb, n_literals, clause_outputs):
 
     # captures the imply opperation ta -> lit?
 
-    clause_outputs = np.ones(cb.shape[0], dtype=np.uint8)
+    clause_outputs.fill(1)
     
     for clause_k in range(cb.shape[0]):
 
@@ -128,8 +128,8 @@ def update_clause(clause_row, clause_weight, target, literals, n_literals, claus
 
 @njit
 def T1aFeedback(clause_row, literals, n_literals, s):
+    
     s_inv = (1.0 / s)
-    s_min1_inv = (s - 1.0) / s
 
     upper_state =  127
     lower_state = -127
@@ -138,11 +138,11 @@ def T1aFeedback(clause_row, literals, n_literals, s):
 
         if(literals[literal_k] == 1):
 
-            if(np.random.random() <= s_min1_inv):
+            # here we boost true possitives
 
-                if(clause_row[literal_k] < upper_state):
+            if(clause_row[literal_k] < upper_state):
 
-                    clause_row[literal_k] += 1
+                clause_row[literal_k] += 1
 
 
             if(np.random.random() <= s_inv):
@@ -155,9 +155,10 @@ def T1aFeedback(clause_row, literals, n_literals, s):
                 if(clause_row[literal_k] > lower_state):
                     clause_row[literal_k] -= 1
 
-            if(np.random.random() <= s_min1_inv):
-                if(clause_row[literal_k + n_literals] < upper_state):
-                    clause_row[literal_k + n_literals] += 1            
+            # here we boost true possitives
+
+            if(clause_row[literal_k + n_literals] < upper_state):
+                clause_row[literal_k + n_literals] += 1            
 
 @njit
 def T1bFeedback(clause_row, n_literals, s):

@@ -17,20 +17,19 @@ from tsetlin_macine import TsetlinMachine
 
 if __name__ == "__main__":
 
-    x, y = get_xor(n_rows = 4100, flip_fraction=0.2, add_negated=True)
-    xt, yt = get_xor(n_rows = 820, flip_fraction=0.0, add_negated=True)
+    x, y = get_xor(n_rows = 4100, noise_fraction=0.4)
+    xt, yt = get_xor(n_rows = 820, noise_fraction=0.0)
 
 
-    tm = TsetlinMachine(n_clauses=10,
-                        threshold=20,
-                        s=5.0,
-                        n_literals=6)
+    tm = TsetlinMachine(n_clauses=1000,
+                        threshold=2000,
+                        s=15.0)
 
     tm.set_train_data(x, y)
 
     tm.set_eval_data(xt, yt)
 
-    tm.train(training_epochs=1000)
+    tm.train(training_epochs=1000, eval_freq=10)
 
 
     # import numpy as np
@@ -52,6 +51,6 @@ if __name__ == "__main__":
     #     tm.fit(x.astype(np.uint32), y.astype(np.uint32))
 
     #     res = 100 * (tm.predict(xt) == yt).mean()
-    #     print(res)
-    #     if res == 100:
-    #         break
+    #     # print(res)
+    #     # if res == 100:
+    #     #     break
