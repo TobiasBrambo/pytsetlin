@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     tm.set_eval_data(X_test, y_test)
 
-    r = tm.train(training_epochs=20)
+    r = tm.train()
     
     print(r)
 
