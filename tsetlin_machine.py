@@ -136,7 +136,7 @@ class TsetlinMachine:
                     y_hat = executor.eval_predict(self.x_eval, self.C, self.W, self.n_literals)
 
                     eval_score = round(100 * np.mean(y_hat == self.y_eval), 2)
-                    r["eval_acc"].append(et-st)
+                    r["eval_acc"].append(eval_score)
 
                     if best_eval_acc == 'N/A' or eval_score > best_eval_acc:
                         best_eval_acc = round(eval_score, 2)
