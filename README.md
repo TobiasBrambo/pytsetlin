@@ -3,9 +3,9 @@
 
 README.md under construction...
 
-A low-code, feature-POOR, Pythonic implementation of a Coalesced Tsetlin Machine. This is not intended to be a feature-rich or speed-optimized implementation; see relevant repositories like _, _, for that. However, it's intended to be an easy-to-use TM programmed in Python, making it easy to plug-and-play new ideas to quickly test get some results, either on a input level or TM structure level. Also, by being completely written in Python, it's easily readable to compare the implementation to the theory presented in the papers, maybe making it easier to understand.
+A low-code, feature-POOR, Pythonic implementation of a Coalesced Tsetlin Machine. This is not intended to be a feature-rich or speed-optimized implementation; see relevant repositories like _, _, for that. However, it's intended to be an easy-to-use TM programmed in Python, with the intent of making it easy to plug-and-play new ideas to quickly test and be able to get some results, either on a input level or TM memory level. Also, by being completely written in Python, it's readable to compare the implementation to the theory presented in the papers, maybe making it easier to understand.
 
-Even though this repo is not focused on speed, I have made some heavy functions compatible for Numba compilation. Without this, the code is so slow that it makes the implementation unusable.
+Even though this repo is not focused on speed, I have made some functions compatible for Numba compilation. Without this, the code would be so slow that it deems the implementation unusable.
 
 ## Installation
 
