@@ -60,7 +60,7 @@ def classify(x, clause_block, weight_block, n_literals):
 def eval_predict(x, cb, wb, n_literals):
     y_pred = np.zeros(x.shape[0], dtype=np.int32)
     
-    for i in prange(x.shape[0]):
+    for i in range(x.shape[0]):
         y_pred[i] = classify(x[i], cb, wb, n_literals)
     
     return y_pred

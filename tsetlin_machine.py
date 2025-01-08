@@ -2,7 +2,7 @@ from core import executor
 import tqdm
 import numpy as np
 from time import perf_counter
-
+import os
 
 class TsetlinMachine:
     def __init__(self,
@@ -103,7 +103,8 @@ class TsetlinMachine:
               training_epochs:int=10,
               eval_freq:int=1,
               hide_progress_bar:bool=False,
-              early_stop_at:float=100.0):
+              early_stop_at:float=100.0,
+              save_best_state=True):
 
 
         self.allocate_memory()
@@ -142,6 +143,9 @@ class TsetlinMachine:
                         best_eval_acc = round(eval_score, 2)
                         r["best_eval_acc"] = best_eval_acc
 
+                        if save_best_state:
+                            self.save_state()
+
                 r["train_time"].append(et-st)
 
                 progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}") 
@@ -159,6 +163,25 @@ class TsetlinMachine:
         return executor.classify(x, self.C, self.W, self.n_literals)
 
 
+    def evaluate_clauses(self, literals, memory:np.array=None):
+
+        if memory is None and self.C is None:
+            raise ValueError('did not find loaded input memory or trained memory. either input a loaded memory or train tm.')
+
+        if self.C is not None:
+            memory = self.C
+
+        literals_n = [literals, 1 - literals] # add negation to literals
+
+        return executor.evaluate_clause(literals_n, memory, literals.shape[0])
+
+
+    def save_state(self, file_name = 'tm_state.npz', location_dir='saved_states'):
+
+        if not os.path.isdir(f'{location_dir}'):
+            os.mkdir(f'{location_dir}')
+
+        np.savez(f"{location_dir}/{file_name}", C=self.C, W=self.W)
 
 
 if __name__ == "__main__":

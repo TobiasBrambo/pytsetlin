@@ -80,3 +80,16 @@ def test_training_performance(basic_tsetlin, sample_binary_data):
     
     accuracy = np.mean(predictions == y_test)
     assert accuracy == 1.0  
+
+
+
+def test_singal_eval(basic_tsetlin):
+
+    C = np.array([[100, -100], [-100, 100]])
+
+    x = np.array([1])
+
+    clause_outputs = basic_tsetlin.evaluate_clauses(x, memory=C)
+
+    assert clause_outputs[0] == 1 
+    assert clause_outputs[1] == 0
