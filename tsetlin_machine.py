@@ -116,11 +116,12 @@ class TsetlinMachine:
             'eval_acc' : [],
         }
 
-        best_eval_acc = "N/A"
         eval_score = "N/A"
-
+        best_eval_acc = "N/A"
+        best_eval_epoch = "#"
+        
         with tqdm.tqdm(total=training_epochs, disable=hide_progress_bar) as progress_bar:
-            progress_bar.set_description(f"[0/{training_epochs}], Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}")
+            progress_bar.set_description(f"[0/{training_epochs}], Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}({best_eval_epoch})")
 
 
             for epoch in range(training_epochs):
@@ -138,19 +139,22 @@ class TsetlinMachine:
 
                     y_hat = executor.eval_predict(self.x_eval, self.C, self.W, self.n_literals)
 
-                    eval_score = round(100 * np.mean(y_hat == self.y_eval), 2)
+                    eval_score = round(100 * np.mean(y_hat == self.y_eval).item(), 2)
                     r["eval_acc"].append(eval_score)
 
                     if best_eval_acc == 'N/A' or eval_score > best_eval_acc:
-                        best_eval_acc = round(eval_score, 2)
+                        best_eval_acc = eval_score
+                        best_eval_epoch = epoch+1
                         r["best_eval_acc"] = best_eval_acc
+                        r["best_eval_epoch"] = best_eval_epoch
+
 
                         if save_best_state:
                             self.save_state()
 
-                r["train_time"].append(et-st)
+                r["train_time"].append(round(et-st, 2))
 
-                progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}") 
+                progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}({best_eval_epoch})") 
                 progress_bar.update(1)
 
                 if not eval_score == 'N/A':
