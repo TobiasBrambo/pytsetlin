@@ -13,8 +13,8 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = get_mnist()
 
-    tm = TsetlinMachine(n_clauses=100,
-                        threshold=200,
+    tm = TsetlinMachine(n_clauses=500,
+                        threshold=625,
                         s=10.0)
 
     tm.set_train_data(X_train, y_train)
