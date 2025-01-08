@@ -4,17 +4,23 @@ import numpy as np
 
 
 @njit
-def evaluate_clauses_training(literals, cb, n_literals, clause_outputs):
+def evaluate_clauses_training(literals, cb, n_literals, clause_outputs, literals_counts):
 
     # captures the imply operation ta -> lit?
 
     clause_outputs.fill(1)
+
+    literals_counts.fill(0)
     
     for clause_k in range(cb.shape[0]):
+
+        pos_literal_count = 0
+        neg_literal_count = 0
 
         for literal_k in range(n_literals):
 
             if(cb[clause_k][literal_k] > 0):
+
 
                 if(literals[literal_k] == 0):
 
@@ -22,7 +28,10 @@ def evaluate_clauses_training(literals, cb, n_literals, clause_outputs):
 
                     break
             
+                pos_literal_count += 1
+
             if(cb[clause_k][literal_k + n_literals] > 0):
+
 
                 if(literals[literal_k] == 1):   
 
@@ -30,7 +39,10 @@ def evaluate_clauses_training(literals, cb, n_literals, clause_outputs):
 
                     break
 
-    return clause_outputs
+                neg_literal_count += 1
+
+        literals_counts[clause_k] = pos_literal_count + neg_literal_count
+
 
 
 @njit
@@ -87,9 +99,12 @@ def get_update_p(wb, clause_outputs, threshold, y, target_class):
 
 
 @njit
-def update_clauses(cb, wb, clause_outputs, positive_prob, negative_prob, target, not_target, literals, n_literals, s):
+def update_clauses(cb, wb, clause_outputs, literals_counts, positive_prob, negative_prob, target, not_target, literals, n_literals, n_literal_budget, s):
     
     for clause_k in range(cb.shape[0]):
+
+        if literals_counts[clause_k] > n_literal_budget:
+            clause_outputs[clause_k] = 0
 
         if np.random.random() <= positive_prob:
             update_clause(cb[clause_k], wb[target], 1, literals, n_literals, clause_outputs[clause_k], clause_k, s) 

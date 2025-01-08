@@ -11,7 +11,7 @@ from tsetlin_machine import TsetlinMachine
 
 if __name__ == "__main__":
 
-    x_train, y_train, x_test, y_test = get_imdb()
+    x_train, y_train, x_test, y_test = get_imdb(save_vocab=True)
 
     tm = TsetlinMachine(n_clauses=100,
                         threshold=50,
@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     tm.set_eval_data(x_test, y_test)
 
-    r = tm.train(training_epochs=100)
+    r = tm.train(training_epochs=10)
     
     print(r)
 

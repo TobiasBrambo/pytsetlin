@@ -8,11 +8,13 @@ class TsetlinMachine:
     def __init__(self,
                  n_clauses:int = 50,
                  s:float = 5.0,
-                 threshold:int = 100):
+                 threshold:int = 100,
+                 n_literal_budget=np.inf):
 
         self.n_clauses = n_clauses        
         self.s = s    
         self.threshold = threshold    
+        self.n_literal_budget = n_literal_budget
 
         self.C = None        
         self.W = None
@@ -127,7 +129,7 @@ class TsetlinMachine:
 
                 executor.train_epoch(
                     self.C, self.W, self.x_train, self.y_train, 
-                    self.threshold, self.s, self.n_outputs, self.n_literals
+                    self.threshold, self.s, self.n_outputs, self.n_literals, self.n_literal_budget
                     )
                 
                 et = perf_counter()
