@@ -27,7 +27,7 @@ class TsetlinMachine:
 
 
 
-    def set_train_data(self, instances:np.array, targets:np.array, feature_negation:bool=True):
+    def set_train_data(self, instances:np.array, targets:np.array):
         
 
         if not isinstance(instances, np.ndarray):
@@ -43,20 +43,15 @@ class TsetlinMachine:
             raise ValueError("Data y_train must be of type np.uint32, was: {}".format(targets.dtype))
         
 
-        if feature_negation:
-            self.n_literals = instances.shape[1]
-            self.x_train = np.c_[instances, 1 - instances]
-
-        else:
-            self.n_literals = instances.shape[1] // 2
-            self.x_train = instances
-
+        self.n_literals = instances.shape[1]
+        self.n_outputs = len(np.unique(targets)) 
+        
+        self.x_train = instances
         self.y_train = targets
 
-        self.n_outputs = len(np.unique(self.y_train)) 
 
 
-    def set_eval_data(self, instances:np.array, targets:np.array, feature_negation:bool=True):
+    def set_eval_data(self, instances:np.array, targets:np.array):
         
         if not isinstance(instances, np.ndarray):
             raise ValueError("x_eval must be of type np.ndarray, x_eval type: {}".format(type(instances)))
@@ -70,11 +65,8 @@ class TsetlinMachine:
         if targets.dtype != np.uint32:
             raise ValueError("Data y_eval must be of type np.uint32, was: {}".format(targets.dtype))
         
-        if feature_negation:
-            self.x_eval = np.c_[instances, 1 - instances]
-        else:
-            self.x_eval = instances
 
+        self.x_eval = instances
         self.y_eval = targets
 
     
@@ -121,7 +113,7 @@ class TsetlinMachine:
         best_eval_epoch = "#"
         
         with tqdm.tqdm(total=training_epochs, disable=hide_progress_bar) as progress_bar:
-            progress_bar.set_description(f"[0/{training_epochs}], Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}({best_eval_epoch})")
+            progress_bar.set_description(f"[0/{training_epochs}]: Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc} ({best_eval_epoch})")
 
 
             for epoch in range(training_epochs):
@@ -154,7 +146,7 @@ class TsetlinMachine:
 
                 r["train_time"].append(round(et-st, 2))
 
-                progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc}({best_eval_epoch})") 
+                progress_bar.set_description(f"[{epoch+1}/{training_epochs}]: Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc} ({best_eval_epoch})") 
                 progress_bar.update(1)
 
                 if not eval_score == 'N/A':
@@ -177,9 +169,7 @@ class TsetlinMachine:
         if self.C is not None:
             memory = self.C
 
-        literals_n = [literals, 1 - literals] # add negation to literals
-
-        return executor.evaluate_clause(literals_n, memory, literals.shape[0])
+        return executor.evaluate_clause(literals, memory, literals.shape[0])
 
 
     def save_state(self, file_name = 'tm_state.npz', location_dir='saved_states'):
