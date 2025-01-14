@@ -3,7 +3,8 @@
 
 README.md under construction...
 
-A low-code, feature-POOR, Pythonic implementation of a Coalesced Tsetlin Machine. This is not intended to be a feature-rich or speed-optimized implementation; see relevant repositories like _, _, for that. However, it's intended to be an easy-to-use TM programmed in Python, with the intent of making it easy to plug-and-play new ideas to quickly test and be able to get some results, either on a input level or TM memory level. Also, by being completely written in Python, it's readable to compare the implementation to the theory presented in the papers, maybe making it easier to understand.
+A low-code, feature-POOR, Pythonic implementation of a Coalesced Tsetlin Machine. This is not intended to be a feature-rich or speed-optimized implementation; see relevant repositories like [
+TMU](https://github.com/cair/tmu) and [green-tsetlin](https://github.com/ooki/green_tsetlin) for that. However, it's intended to be an easy-to-use TM programmed in Python, with the intent of making it easy to plug-and-play new ideas to quickly test and be able to get some results, either on a input level or TM memory level. Also, by being completely written in Python, it's readable to compare the implementation to the theory presented in the papers, maybe making it easier to understand.
 
 Even though this repo is not focused on speed, I have made some functions compatible for Numba compilation. Without this, the code would be so slow that it deems the implementation unusable.
 
@@ -43,6 +44,18 @@ print(r)
 93.21, 93.49, 94.42, 94.32, 94.73, 94.74, 95.64, 95.67, 96.68], 'best_eval_acc': 96.68, 'best_eval_epoch': 10}
 
 ```
+## Literature References
+
+* Core Papers 
+
+     * [The Tsetlin Machine](https://arxiv.org/abs/1804.01508) introduces the Tsetlin Machine.
+
+     * [Coalesced Multi-Output Tsetlin Machines](https://arxiv.org/abs/2108.07594) the variation this repo is largly based on.
+
+* Other Cool Developments 
+
+    * [Sparse Tsetlin Machine](https://arxiv.org/abs/2405.02375)
+
 
 ## Notes
 
@@ -55,6 +68,3 @@ print(r)
 
 MIT Licence
 
-## References
-
-Add paper refs
