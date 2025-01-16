@@ -98,7 +98,7 @@ class TsetlinMachine:
               eval_freq:int=1,
               hide_progress_bar:bool=False,
               early_stop_at:float=100.0,
-              save_best_state=True):
+              save_best_state=False):
 
 
         self.allocate_memory()
