@@ -1,15 +1,19 @@
 from core import executor
+from core import config
 import tqdm
 import numpy as np
 from time import perf_counter
 import os
+
+
 
 class TsetlinMachine:
     def __init__(self,
                  n_clauses:int = 50,
                  s:float = 5.0,
                  threshold:int = 100,
-                 n_literal_budget=np.inf):
+                 n_literal_budget=np.inf,
+                 n_threds=1):
 
         self.n_clauses = n_clauses        
         self.s = s    
@@ -25,6 +29,8 @@ class TsetlinMachine:
         self.x_eval = None
         self.y_eval = None
 
+        config.N_THREDS = n_threds
+        config.OPERATE_PARALLEL = True if config.N_THREDS > 1 and not config.N_THREDS <= 0 else False
 
 
     def set_train_data(self, instances:np.array, targets:np.array):
@@ -184,4 +190,3 @@ if __name__ == "__main__":
 
     tm = TsetlinMachine()
 
-    tm.train()

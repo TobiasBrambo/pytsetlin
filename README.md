@@ -30,20 +30,25 @@ X_train, X_test, y_train, y_test = get_mnist()
 
 tm = TsetlinMachine(n_clauses=500,
                     threshold=625,
-                    s=10.0)
+                    s=10.0,
+                    n_threds=20)
 
 tm.set_train_data(X_train, y_train)
 
 tm.set_eval_data(X_test, y_test)
 
-r = tm.train()
+r = tm.train(training_epochs=10)
 
-print(r)
-
->>> {'train_time': [41.03, 27.02, 24.46, 22.93, 22.03, 21.11, 20.97, 21.55, 20.93, 19.46], 'eval_acc': [91.69, 
-93.21, 93.49, 94.42, 94.32, 94.73, 94.74, 95.64, 95.67, 96.68], 'best_eval_acc': 96.68, 'best_eval_epoch': 10}
-
+# progress bar for visualization
+>>> [10/10]: Eval Acc: 96.37, Best Eval Acc: 96.37 (10): 100%|██████████| 10/10 [01:14<00:00,  7.45s/it]
 ```
+
+```python
+print(r)
+>>> {'train_time': [14.44, 6.85, 6.55, 6.72, 6.28, 6.94, 6.42, 6.7, 6.31, 7.11], 'eval_acc': [91.36, 93.27, 93.88, 94.69, 94.93, 95.17, 95.22, 95.41, 95.46, 96.37], 'best_eval_acc': 96.37, 'best_eval_epoch': 10}
+```
+Note performance may vary depending on system! 
+
 ## Literature References
 
 * Core Papers 

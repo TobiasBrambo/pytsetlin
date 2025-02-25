@@ -1,15 +1,14 @@
-
-
-from numba import njit, prange
+from numba import njit, prange, set_num_threads
 import numpy as np
-
-
 from core.feedback import evaluate_clauses_training, get_update_p, update_clauses, evaluate_clause
 
+from core import config
 
 
 @njit
 def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals, n_literal_budget):
+    
+    set_num_threads(config.N_THREDS)
 
     cb = np.ascontiguousarray(cb)
     wb = np.ascontiguousarray(wb)
@@ -58,7 +57,7 @@ def classify(x, clause_block, weight_block, n_literals):
 
     return np.argmax(class_sums)
   
-@njit(parallel=True)
+@njit(parallel=config.OPERATE_PARALLEL)
 def eval_predict(x, cb, wb, n_literals):
     y_pred = np.zeros(x.shape[0], dtype=np.uint32)
     

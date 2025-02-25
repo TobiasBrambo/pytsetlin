@@ -1,9 +1,10 @@
-
-from numba import njit
+from numba import njit, prange
 import numpy as np
 
+from core import config
 
-@njit
+
+@njit(parallel=config.OPERATE_PARALLEL)
 def evaluate_clauses_training(literals, cb, n_literals, clause_outputs, literals_counts):
 
     # captures the imply operation ta -> lit?
@@ -12,7 +13,7 @@ def evaluate_clauses_training(literals, cb, n_literals, clause_outputs, literals
 
     literals_counts.fill(0)
     
-    for clause_k in range(cb.shape[0]):
+    for clause_k in prange(cb.shape[0]):
 
         pos_literal_count = 0
         neg_literal_count = 0
@@ -98,10 +99,10 @@ def get_update_p(wb, clause_outputs, threshold, y, target_class):
 
 
 
-@njit
+@njit(parallel=config.OPERATE_PARALLEL)
 def update_clauses(cb, wb, clause_outputs, literals_counts, positive_prob, negative_prob, target, not_target, literals, n_literals, n_literal_budget, s):
     
-    for clause_k in range(cb.shape[0]):
+    for clause_k in prange(cb.shape[0]):
 
         if literals_counts[clause_k] > n_literal_budget:
             clause_outputs[clause_k] = 0

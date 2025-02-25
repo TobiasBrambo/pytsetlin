@@ -1,0 +1,3 @@
+
+N_THREDS = 1
+OPERATE_PARALLEL = True
