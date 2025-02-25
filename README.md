@@ -31,7 +31,7 @@ X_train, X_test, y_train, y_test = get_mnist()
 tm = TsetlinMachine(n_clauses=500,
                     threshold=625,
                     s=10.0,
-                    n_threds=20)
+                    n_threads=20)
 
 tm.set_train_data(X_train, y_train)
 
@@ -45,7 +45,8 @@ r = tm.train(training_epochs=10)
 
 ```python
 print(r)
->>> {'train_time': [14.44, 6.85, 6.55, 6.72, 6.28, 6.94, 6.42, 6.7, 6.31, 7.11], 'eval_acc': [91.36, 93.27, 93.88, 94.69, 94.93, 95.17, 95.22, 95.41, 95.46, 96.37], 'best_eval_acc': 96.37, 'best_eval_epoch': 10}
+>>> {'train_time': [14.44, 6.85, 6.55, 6.72, 6.28, 6.94, 6.42, 6.7, 6.31, 7.11], 'eval_acc': [91.36, 93.27, 93.88, 94.69, 
+94.93, 95.17, 95.22, 95.41, 95.46, 96.37], 'best_eval_acc': 96.37, 'best_eval_epoch': 10}
 ```
 Note performance may vary depending on system! 
 

@@ -8,7 +8,7 @@ from core import config
 @njit
 def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals, n_literal_budget):
     
-    set_num_threads(config.N_THREDS)
+    set_num_threads(config.N_THREADS)
 
     cb = np.ascontiguousarray(cb)
     wb = np.ascontiguousarray(wb)
