@@ -10,7 +10,14 @@ Even though this repo is not focused on speed, I have made some functions compat
 
 ## Installation
 
-Clone or fork this repository and install the required dependencies:
+1. Install package to environment to use in other projects:
+```bash
+git clone git@github.com:Sebastianostby/pytsetlin.git
+cd pytsetlin
+pip install . # install pytsetlin in env.
+```
+
+2. Clone or template this repository and install the required dependencies:
 
 ```bash
 cd pytsetlin
@@ -22,9 +29,8 @@ pip install -r requirements.txt
 Here's a basic example of how to use the Tsetlin Machine:
 
 ```python
-from data.mnist import get_mnist
-
-from tsetlin_machine import TsetlinMachine
+from pytsetlin import TsetlinMachine
+from pytsetlin.data.mnist import get_mnist
 
 X_train, X_test, y_train, y_test = get_mnist()
 
@@ -40,13 +46,12 @@ tm.set_eval_data(X_test, y_test)
 r = tm.train(training_epochs=10)
 
 # progress bar for visualization
->>> [10/10]: Eval Acc: 96.37, Best Eval Acc: 96.37 (10): 100%|██████████| 10/10 [01:14<00:00,  7.45s/it]
+>>> Eval Acc: 96.31, Best Eval Acc: 96.31 (10): 100%|██████████| 10/10 [01:03<00:00,  6.30s/it]
 ```
 
 ```python
 print(r)
->>> {'train_time': [14.44, 6.85, 6.55, 6.72, 6.28, 6.94, 6.42, 6.7, 6.31, 7.11], 'eval_acc': [91.36, 93.27, 93.88, 94.69, 
-94.93, 95.17, 95.22, 95.41, 95.46, 96.37], 'best_eval_acc': 96.37, 'best_eval_epoch': 10}
+>>> {'train_time': [12.25, 5.77, 5.42, 4.96, 6.83, 4.71, 4.58, 4.88, 4.11, 5.9], 'eval_acc': [91.56, 92.97, 93.45, 94.42, 94.24, 94.71, 94.82, 95.1, 95.11, 96.31], 'best_eval_acc': 96.31, 'best_eval_epoch': 10}
 ```
 Note performance may vary depending on system! 
 
