@@ -1,13 +1,12 @@
-from numba import njit, prange, set_num_threads
+from numba import njit, prange
 import numpy as np
 from pytsetlin.core.feedback import evaluate_clauses_training, get_update_p, update_clauses, evaluate_clause
 from pytsetlin.core import config
 
 
 @njit
-def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals, n_literal_budget):
+def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals, n_literal_budget):
     
-    set_num_threads(config.N_THREADS)
 
     cb = np.ascontiguousarray(cb)
     wb = np.ascontiguousarray(wb)
@@ -16,8 +15,9 @@ def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals, n_literal_bud
     np.random.shuffle(indices)
 
     clause_outputs = np.ones(cb.shape[0], dtype=np.uint8)
-
     literals_counts = np.zeros(cb.shape[0], dtype=np.uint32)
+    update_ps = np.zeros(n_outputs, dtype=np.float32)
+
 
     for indice in indices:
         literals = x[indice]
@@ -25,10 +25,11 @@ def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals, n_literal_bud
         
         evaluate_clauses_training(literals, cb, n_literals, clause_outputs, literals_counts)
         
-        update_ps = np.zeros(n_outputs, dtype=np.float32)
+        update_ps.fill(0.0)
+        vote_values = np.dot(wb.astype(np.float32), clause_outputs.astype(np.float32))
 
         for i in range(n_outputs):
-            update_ps[i] = get_update_p(wb, clause_outputs, threshold, i, i == target)
+            update_ps[i] = get_update_p(vote_values, threshold, i, i == target)
         
         if np.sum(update_ps) == 0.0:
             continue
@@ -41,7 +42,7 @@ def train_epoch(cb, wb, x, y, threshold, s, n_outputs, n_literals, n_literal_bud
         neg_update_p = update_ps[not_target]
         
         update_clauses(cb, wb, clause_outputs, literals_counts, pos_update_p, neg_update_p, 
-                      target, not_target, literals, n_literals, n_literal_budget, s)
+                      target, not_target, literals, n_literals, n_literal_budget, s_min_inv, s_inv)
 
 
     return

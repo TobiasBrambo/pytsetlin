@@ -85,10 +85,8 @@ def evaluate_clause(literals, clause_block, n_literals):
 
 
 @njit
-def get_update_p(wb, clause_outputs, threshold, y, target_class):
+def get_update_p(vote_values, threshold, y, target_class):
   
-    vote_values = np.dot(wb.astype(np.float32), clause_outputs.astype(np.float32))
-
     vote_value = np.clip(np.array(vote_values[y]), -threshold, threshold)
 
     if target_class:
@@ -99,7 +97,7 @@ def get_update_p(wb, clause_outputs, threshold, y, target_class):
 
 
 @njit(parallel=config.OPERATE_PARALLEL)
-def update_clauses(cb, wb, clause_outputs, literals_counts, positive_prob, negative_prob, target, not_target, literals, n_literals, n_literal_budget, s):
+def update_clauses(cb, wb, clause_outputs, literals_counts, positive_prob, negative_prob, target, not_target, literals, n_literals, n_literal_budget, s_min_inv, s_inv):
     
     for clause_k in prange(cb.shape[0]):
 
@@ -107,16 +105,16 @@ def update_clauses(cb, wb, clause_outputs, literals_counts, positive_prob, negat
             clause_outputs[clause_k] = 0
 
         if np.random.random() <= positive_prob:
-            update_clause(cb, wb, 1, literals, n_literals, clause_outputs, clause_k, target, s) 
+            update_clause(cb, wb, 1, literals, n_literals, clause_outputs, clause_k, target, s_min_inv, s_inv) 
 
         if np.random.random() <= negative_prob:
-            update_clause(cb, wb, -1, literals, n_literals, clause_outputs, clause_k, not_target, s) 
+            update_clause(cb, wb, -1, literals, n_literals, clause_outputs, clause_k, not_target, s_min_inv, s_inv) 
  
 
 
 
 @njit
-def update_clause(cb, wb, target, literals, n_literals, clause_output, clause_k, class_k, s):
+def update_clause(cb, wb, target, literals, n_literals, clause_output, clause_k, class_k, s_min_inv, s_inv):
     
     sign = 1 if (wb[class_k, clause_k] >= 0) else -1
 
@@ -126,11 +124,11 @@ def update_clause(cb, wb, target, literals, n_literals, clause_output, clause_k,
 
             wb[class_k, clause_k] += sign
 
-            T1aFeedback(cb, clause_k, literals, n_literals, s)
+            T1aFeedback(cb, clause_k, literals, n_literals, s_min_inv, s_inv)
 
         else:
             
-            T1bFeedback(cb, clause_k, n_literals, s)
+            T1bFeedback(cb, clause_k, n_literals, s_min_inv, s_inv)
 
     elif(target*sign < 0):
 
@@ -142,10 +140,8 @@ def update_clause(cb, wb, target, literals, n_literals, clause_output, clause_k,
 
 
 @njit
-def T1aFeedback(cb, clause_k, literals, n_literals, s):
+def T1aFeedback(cb, clause_k, literals, n_literals, s_min_inv, s_inv):
     
-    s_inv = (1.0 / s)
-
     upper_state =  127
     lower_state = -127
 
@@ -176,11 +172,9 @@ def T1aFeedback(cb, clause_k, literals, n_literals, s):
                 cb[clause_k, literal_k + n_literals] += 1            
 
 @njit
-def T1bFeedback(cb, clause_k, n_literals, s):
+def T1bFeedback(cb, clause_k, n_literals, s_min_inv, s_inv):
 
-    s_inv = (1.0 / s)
     lower_state = -127
-
     
     for literal_k in range(n_literals):
 
