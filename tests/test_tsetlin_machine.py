@@ -3,8 +3,8 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 import numpy as np
-from tsetlin_machine import TsetlinMachine
-from data import xor
+from pytsetlin.tsetlin_machine import TsetlinMachine
+from pytsetlin.data import xor
 
 @pytest.fixture
 def sample_binary_data():
