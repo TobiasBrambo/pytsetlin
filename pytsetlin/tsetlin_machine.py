@@ -1,5 +1,5 @@
-from core import executor
-from core import config
+from pytsetlin.core import executor
+from pytsetlin.core import config
 import tqdm
 import numpy as np
 from time import perf_counter
@@ -105,7 +105,6 @@ class TsetlinMachine:
               hide_progress_bar:bool=False,
               early_stop_at:float=100.0,
               save_best_state=False):
-
 
         self.allocate_memory()
 

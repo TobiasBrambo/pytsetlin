@@ -2,10 +2,8 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from data.parity import get_parity
-
-
-from tsetlin_machine import TsetlinMachine
+from pytsetlin.data.parity import get_parity
+from pytsetlin import TsetlinMachine
 
 
 

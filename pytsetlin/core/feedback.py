@@ -1,7 +1,6 @@
 from numba import njit, prange
 import numpy as np
-
-from core import config
+from pytsetlin.core import config
 
 
 @njit(parallel=config.OPERATE_PARALLEL)

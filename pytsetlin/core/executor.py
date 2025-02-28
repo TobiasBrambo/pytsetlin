@@ -1,8 +1,7 @@
 from numba import njit, prange, set_num_threads
 import numpy as np
-from core.feedback import evaluate_clauses_training, get_update_p, update_clauses, evaluate_clause
-
-from core import config
+from pytsetlin.core.feedback import evaluate_clauses_training, get_update_p, update_clauses, evaluate_clause
+from pytsetlin.core import config
 
 
 @njit
