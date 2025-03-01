@@ -12,9 +12,7 @@ Even though this repo is not focused on speed, I have made some functions compat
 
 1. Install package to environment to use in other projects:
 ```bash
-git clone git@github.com:Sebastianostby/pytsetlin.git
-cd pytsetlin
-pip install . # install pytsetlin in env.
+pip install git+https://github.com/Sebastianostby/pytsetlin.git # install pytsetlin in env.
 ```
 
 2. Clone or template this repository and install the required dependencies:

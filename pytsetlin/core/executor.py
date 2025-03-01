@@ -5,7 +5,7 @@ from pytsetlin.core import config
 
 
 @njit
-def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals, n_literal_budget):
+def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals, n_literal_budget, boost_true_positives):
     
 
     cb = np.ascontiguousarray(cb)
@@ -41,8 +41,8 @@ def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals
         pos_update_p = update_ps[target]
         neg_update_p = update_ps[not_target]
         
-        update_clauses(cb, wb, clause_outputs, literals_counts, pos_update_p, neg_update_p, 
-                      target, not_target, literals, n_literals, n_literal_budget, s_min_inv, s_inv)
+        update_clauses(cb, wb, clause_outputs, literals_counts, pos_update_p, neg_update_p, target, 
+                       not_target, literals, n_literals, n_literal_budget, s_min_inv, s_inv, boost_true_positives)
 
 
     return
