@@ -13,13 +13,15 @@ class TsetlinMachine:
                  n_clauses:int = 50,
                  s:float = 5.0,
                  threshold:int = 100,
-                 n_literal_budget=np.inf,
-                 n_threads=1):
+                 n_literal_budget:int = np.inf,
+                 boost_true_positives:bool = True, 
+                 n_threads:int = 1):
 
         self.n_clauses = n_clauses        
         self.s = s    
         self.threshold = threshold    
         self.n_literal_budget = n_literal_budget
+        self.boost_true_positives = boost_true_positives    
 
         self.C = None        
         self.W = None
@@ -138,8 +140,8 @@ class TsetlinMachine:
 
                 executor.train_epoch(
                     self.C, self.W, self.x_train, self.y_train, 
-                    self.threshold, self.s_min_inv, self.s_inv, self.n_outputs, self.n_literals, self.n_literal_budget
-                    )
+                    self.threshold, self.s_min_inv, self.s_inv, self.n_outputs, self.n_literals, self.n_literal_budget,
+                    self.boost_true_positives)
                 
                 et = perf_counter()
                 
