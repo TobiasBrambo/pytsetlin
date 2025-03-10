@@ -117,7 +117,15 @@ class TsetlinMachine:
               eval_freq:int=1,
               hide_progress_bar:bool=False,
               early_stop_at:float=100.0,
-              save_best_state=False):
+              save_best_state=False,
+              file_name="tm_state.npz",
+              location_dir="saved_states"):
+
+
+        full_path = os.path.join(location_dir, file_name)
+        if os.path.exists(full_path):
+            raise FileExistsError(f"File already exists: {full_path}")
+
 
         self.allocate_memory()
 
@@ -160,7 +168,7 @@ class TsetlinMachine:
 
 
                         if save_best_state:
-                            self.save_state()
+                            self.save_state(file_name=file_name, location_dir=location_dir)
 
                 r["train_time"].append(round(et-st, 2))
 
