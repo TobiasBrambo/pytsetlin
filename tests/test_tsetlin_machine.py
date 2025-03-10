@@ -93,3 +93,40 @@ def test_singal_eval(basic_tsetlin):
 
     assert clause_outputs[0] == 1 
     assert clause_outputs[1] == 0
+
+def test_custom_save_best_filename(basic_tsetlin, sample_binary_data):
+    X_train, y_train, X_test, y_test = sample_binary_data
+    
+    basic_tsetlin.set_train_data(X_train, y_train)
+    basic_tsetlin.set_eval_data(X_test, y_test)
+    
+    tmp_path = "saved_states"
+    custom_filename = "my_custom_best_model.npz"
+    custom_path = os.path.join(tmp_path, custom_filename)
+    
+    assert not os.path.exists(custom_path)
+    
+    results = basic_tsetlin.train(
+        training_epochs=10,
+        eval_freq=1,
+        hide_progress_bar=True,
+        save_best_state=True,
+        file_name = custom_filename,
+        location_dir = tmp_path
+    )
+    
+    assert os.path.exists(custom_path)
+    
+    # Second training run - should raise FileExistsError
+    with pytest.raises(FileExistsError):
+        basic_tsetlin.train(
+            training_epochs=10,
+            eval_freq=1,
+            hide_progress_bar=True,
+            save_best_state=True,
+            file_name= custom_filename,
+            location_dir=tmp_path
+        )
+
+    if os.path.exists(custom_path):
+        os.remove(custom_path)
