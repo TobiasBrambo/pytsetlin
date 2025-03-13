@@ -66,8 +66,6 @@ Since the code is Pythonic, the TM structure can easily be investigated from the
 
 >>> tm.set_train_data(x, y)
 
->>> tm.set_eval_data(x, y)
-
 >>> tm.train()
 
 >>> print(tm.C) # get clause matrix
