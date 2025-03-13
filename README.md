@@ -22,36 +22,64 @@ cd pytsetlin
 pip install -r requirements.txt
 ```
 
-## Example
+## Examples
 
 Here's a basic example of how to use the Tsetlin Machine:
 
 ```python
-from pytsetlin import TsetlinMachine
-from pytsetlin.data.mnist import get_mnist
+>>> from pytsetlin import TsetlinMachine
+>>> from pytsetlin.data.mnist import get_mnist
 
-X_train, X_test, y_train, y_test = get_mnist()
+>>> X_train, X_test, y_train, y_test = get_mnist()
 
-tm = TsetlinMachine(n_clauses=500,
-                    threshold=625,
-                    s=10.0,
-                    n_threads=20)
+>>> tm = TsetlinMachine(n_clauses=500,
+                        threshold=625,
+                        s=10.0,
+                        n_threads=20)
 
-tm.set_train_data(X_train, y_train)
+>>> tm.set_train_data(X_train, y_train)
 
-tm.set_eval_data(X_test, y_test)
+>>> tm.set_eval_data(X_test, y_test)
 
-r = tm.train(training_epochs=10)
+>>> r = tm.train(training_epochs=10)
 
 # progress bar for visualization
->>> Eval Acc: 96.31, Best Eval Acc: 96.31 (10): 100%|██████████| 10/10 [01:03<00:00,  6.30s/it]
-```
+Eval Acc: 96.31, Best Eval Acc: 96.31 (10): 100%|██████████| 10/10 [01:03<00:00,  6.30s/it]
 
-```python
-print(r)
->>> {'train_time': [12.25, 5.77, 5.42, 4.96, 6.83, 4.71, 4.58, 4.88, 4.11, 5.9], 'eval_acc': [91.56, 92.97, 93.45, 94.42, 94.24, 94.71, 94.82, 95.1, 95.11, 96.31], 'best_eval_acc': 96.31, 'best_eval_epoch': 10}
+>>> print(r)
+{'train_time': [12.25, 5.77, 5.42, 4.96, 6.83, 4.71, 4.58, 4.88, 4.11, 5.9], 'eval_acc': [91.56, 92.97, 93.45, 94.42, 94.24, 94.71, 94.82, 95.1, 95.11, 96.31], 'best_eval_acc': 96.31, 'best_eval_epoch': 10}
 ```
 Note performance may vary depending on system! 
+
+\
+Since the code is Pythonic, the TM structure can easily be investigated from the TsetlinMachine object:
+```python
+>>> # xor gate
+>>> x = np.array([[0, 0],
+                  [0, 1],
+                  [1, 0],
+                  [1, 1]])
+
+>>> y = np.array([0, 1, 1, 0])
+
+>>> tm = TsetlinMachine(n_clauses=4)
+
+>>> tm.set_train_data(x, y)
+
+>>> tm.set_eval_data(x, y)
+
+>>> tm.train()
+
+>>> print(tm.C) # get clause matrix
+[[-35  25  24 -30]
+ [-33 -41  12  23]
+ [ 18 -38 -34  16]
+ [ 17  15 -33 -42]]
+
+>>> print(tm.W) # get weight matrix
+[[-19  17 -20  16]
+ [ 18 -19  18 -18]]
+```
 
 ## Literature References
 
