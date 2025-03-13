@@ -24,6 +24,8 @@ pip install -r requirements.txt
 
 ## Examples
 
+### Basic training example
+
 Here's a basic example of how to use the Tsetlin Machine:
 
 ```python
@@ -51,7 +53,8 @@ Eval Acc: 96.31, Best Eval Acc: 96.31 (10): 100%|██████████|
 ```
 Note performance may vary depending on system! 
 
-\
+
+### Investigating TM structure
 Since the code is Pythonic, the TM structure can easily be investigated from the TsetlinMachine object:
 ```python
 >>> # xor gate
@@ -78,6 +81,52 @@ Since the code is Pythonic, the TM structure can easily be investigated from the
 [[-19  17 -20  16]
  [ 18 -19  18 -18]]
 ```
+
+### Saving and loading
+
+Any TM state can easly be saved during of after training
+
+```python
+>>> from pytsetlin import TsetlinMachine
+>>> from pytsetlin.data.imdb import get_imdb
+
+>>> X_train, X_test, y_train, y_test = get_imdb()
+
+>>> tm = TsetlinMachine(n_clauses=500,
+                        threshold=625,
+                        s=2.0)
+
+>>> tm.set_train_data(X_train, y_train)
+
+>>> tm.set_eval_data(X_test, y_test)
+
+>>> r = tm.train(training_epochs=10, save_best_state=True) # save during training
+
+>>> tm.save_state(file_name='tm_state.npz') # save after training
+```
+
+Then saved memory, or any memory, can be used for predictions after: 
+
+```python
+>>> tm = TsetlinMachine()
+
+>>> state = np.load('tm.state.npz')
+
+>>> C = state['C'] # load clause matrix
+>>> W = state['W'] # load weight matrix 
+
+
+>>> clause_outputs = tm.evaluate_clauses(instance, memory=C) # what clauses matched the input
+[0, 1, 0, 0, 1]
+
+>>> class_sums = np.dot(W, clause_outputs) # majority voting
+[-32, 55]
+
+>>> prediction = np.argmax(class_sums)
+1
+```
+
+
 
 ## Literature References
 
