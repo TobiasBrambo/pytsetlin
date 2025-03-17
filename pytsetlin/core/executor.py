@@ -18,6 +18,7 @@ def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals
     literals_counts = np.zeros(cb.shape[0], dtype=np.uint32)
     update_ps = np.zeros(n_outputs, dtype=np.float32)
 
+    y_hat = np.zeros(y.shape, dtype=np.uint32)
 
     for indice in indices:
         literals = x[indice]
@@ -27,6 +28,7 @@ def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals
         
         update_ps.fill(0.0)
         vote_values = np.dot(wb.astype(np.float32), clause_outputs.astype(np.float32))
+        y_hat[indice] = np.argmax(vote_values)
 
         for i in range(n_outputs):
             update_ps[i] = get_update_p(vote_values, threshold, i, i == target)
@@ -45,7 +47,7 @@ def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals
                        not_target, literals, n_literals, n_literal_budget, s_min_inv, s_inv, boost_true_positives)
 
 
-    return
+    return y_hat
 
 
 @njit
