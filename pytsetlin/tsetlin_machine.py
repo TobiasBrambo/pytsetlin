@@ -131,33 +131,37 @@ class TsetlinMachine:
 
         r = {
             'train_time' : [],
+            'train_acc' : [],
             'eval_acc' : [],
         }
 
+        train_score = "N/A"
         eval_score = "N/A"
         best_eval_acc = "N/A"
         best_eval_epoch = "#"
         
         with tqdm.tqdm(total=training_epochs, disable=hide_progress_bar) as progress_bar:
-            progress_bar.set_description(f"Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc} ({best_eval_epoch})")
+            progress_bar.set_description(f"Train Acc: {train_score}, Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc} ({best_eval_epoch})")
 
 
             for epoch in range(training_epochs):
 
                 st = perf_counter() 
 
-                executor.train_epoch(
-                    self.C, self.W, self.x_train, self.y_train, 
-                    self.threshold, self.s_min_inv, self.s_inv, self.n_outputs, self.n_literals, self.n_literal_budget,
-                    self.boost_true_positives)
-                
+                train_predictions = executor.train_epoch(
+                                        self.C, self.W, self.x_train, self.y_train, 
+                                        self.threshold, self.s_min_inv, self.s_inv, self.n_outputs, self.n_literals, self.n_literal_budget,
+                                        self.boost_true_positives)
+                                    
                 et = perf_counter()
                 
                 if (epoch+1) % eval_freq == 0:
 
-                    y_hat = executor.eval_predict(self.x_eval, self.C, self.W, self.n_literals)
+                    train_score = round(100 * np.mean(train_predictions == self.y_train).item(), 2)
+                    r["train_acc"].append(train_score)
 
-                    eval_score = round(100 * np.mean(y_hat == self.y_eval).item(), 2)
+                    eval_predictions = executor.eval_predict(self.x_eval, self.C, self.W, self.n_literals)
+                    eval_score = round(100 * np.mean(eval_predictions == self.y_eval).item(), 2)
                     r["eval_acc"].append(eval_score)
 
                     if best_eval_acc == 'N/A' or eval_score > best_eval_acc:
@@ -172,7 +176,7 @@ class TsetlinMachine:
 
                 r["train_time"].append(round(et-st, 2))
 
-                progress_bar.set_description(f"Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc} ({best_eval_epoch})") 
+                progress_bar.set_description(f"Train Acc: {train_score}, Eval Acc: {eval_score}, Best Eval Acc: {best_eval_acc} ({best_eval_epoch})") 
                 progress_bar.update(1)
 
                 if not eval_score == 'N/A':
