@@ -16,7 +16,6 @@ def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals
 
     clause_outputs = np.ones(cb.shape[0], dtype=np.uint8)
     literals_counts = np.zeros(cb.shape[0], dtype=np.uint32)
-    update_ps = np.zeros(n_outputs, dtype=np.float32)
 
     y_hat = np.zeros(y.shape, dtype=np.uint32)
 
@@ -26,26 +25,29 @@ def train_epoch(cb, wb, x, y, threshold, s_min_inv, s_inv, n_outputs, n_literals
         
         evaluate_clauses_training(literals, cb, n_literals, clause_outputs, literals_counts)
         
-        update_ps.fill(0.0)
         vote_values = np.dot(wb.astype(np.float32), clause_outputs.astype(np.float32))
-        y_hat[indice] = np.argmax(vote_values)
 
-        for i in range(n_outputs):
-            update_ps[i] = get_update_p(vote_values, threshold, i, i == target)
-        
-        if np.sum(update_ps) == 0.0:
-            continue
-            
-        not_target_candidates = np.arange(n_outputs)
-        not_target_candidates = not_target_candidates[not_target_candidates != target]
-        not_target = np.random.choice(not_target_candidates)
-        
-        pos_update_p = update_ps[target]
-        neg_update_p = update_ps[not_target]
-        
+        not_target = np.random.randint(0, n_outputs)
+
+        while(not_target == target):
+            not_target = np.random.randint(0, n_outputs)
+
+        votes = vote_values[target]
+
+        v_clamped_pos = np.clip(np.array(votes), -threshold, threshold)
+
+        pos_update_p =  (threshold - v_clamped_pos) / (2*threshold)
+
+        votes = vote_values[not_target]
+
+        v_clamped_neg = np.clip(np.array(votes), -threshold, threshold)
+
+        neg_update_p =  (threshold + v_clamped_neg) / (2*threshold)
+
         update_clauses(cb, wb, clause_outputs, literals_counts, pos_update_p, neg_update_p, target, 
-                       not_target, literals, n_literals, n_literal_budget, s_min_inv, s_inv, boost_true_positives)
+                    not_target, literals, n_literals, n_literal_budget, s_min_inv, s_inv, boost_true_positives)
 
+        y_hat[indice] = np.argmax(vote_values)
 
     return y_hat
 
