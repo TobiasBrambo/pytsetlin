@@ -1,16 +1,16 @@
+import logging
+import os
+import re
+from time import perf_counter
+
+from numba import set_num_threads
+import numpy as np
+import optuna
+import tqdm
+
 from pytsetlin.core import executor
 from pytsetlin.core import config
 from pytsetlin.core import tuner
-
-from numba import set_num_threads
-import tqdm
-import numpy as np
-import optuna
-
-from time import perf_counter
-import os
-
-import logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
 
@@ -219,13 +219,18 @@ class TsetlinMachine:
         np.savez(f"{location_dir}/{file_name}", C=self.C, W=self.W)
 
 
-    def optimize_hyperparameters(self, n_trials=100, training_epochs=10):
+    def optimize_hyperparameters(self, n_trials=100, training_epochs=10, study_name=None, storage=None):
+
+        if storage:
+            pattern = r'^sqlite:///[^/]+\.db$'
+            if not re.match(pattern, storage):
+                raise ValueError(f"Storage name format invalid, must on format: sqlite:///STORAGE_NAME.db, currently: {storage}")
 
         logging.info(f"This optimization only tunes threshold, s, boost_true_positives, and n_literal_budget. n_clauses is fixed at {self.n_clauses}.")
 
         self.allocate_memory()
 
-        study = optuna.create_study(direction='maximize')
+        study = optuna.create_study(direction='maximize', study_name=study_name, storage=storage)
 
         study.optimize(lambda trial: tuner.objective(trial, self, training_epochs), n_trials=n_trials, show_progress_bar=True)
 
